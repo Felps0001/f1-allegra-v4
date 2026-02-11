@@ -9,10 +9,26 @@
 <body>
   <canvas id="game"></canvas>
   <div id="hud">
-    <div>Velocidade: <span id="speed">0</span> km/h</div>
     <div>Tempo restante: <span id="timer">0.0</span>s</div>
     <div id="status"></div>
     <div>Setas: virar • Cima: acelerar • Baixo: frear</div>
+  </div>
+  <div id="speedometer" class="speedometer" aria-label="Velocimetro">
+    <div class="speedometer-face">
+      <div class="speedometer-needle" id="speed-needle"></div>
+      <div class="speedometer-center"></div>
+    </div>
+    <div class="speedometer-readout">
+      <span id="speed">0</span>
+      <span class="speedometer-unit">km/h</span>
+    </div>
+  </div>
+  <div id="end-screen" class="end-screen" aria-hidden="true">
+    <div class="end-card">
+      <div id="end-title" class="end-title">CHEGADA!</div>
+      <div class="end-sub">Pressione R ou clique para reiniciar</div>
+      <button id="restart" class="end-button" type="button">Reiniciar</button>
+    </div>
   </div>
   <script src="main.js"></script>
 </body>
