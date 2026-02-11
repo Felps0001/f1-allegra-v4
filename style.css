@@ -1,0 +1,46 @@
+@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600&display=swap");
+
+:root {
+  --sky-top: #8fd0ff;
+  --sky-bottom: #d5f2ff;
+  --ground-1: #3a7d3d;
+  --ground-2: #2f6b32;
+  --road-1: #5a5a5a;
+  --road-2: #4f4f4f;
+  --rumble-1: #2f2f2f;
+  --rumble-2: #262626;
+  --lane: #f5f5f5;
+  --hud-bg: rgba(10, 10, 10, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: "Space Grotesk", sans-serif;
+  background: linear-gradient(180deg, var(--sky-top), var(--sky-bottom));
+  overflow: hidden;
+}
+
+#game {
+  display: block;
+  width: 100vw;
+  height: 100vh;
+}
+
+#hud {
+  position: absolute;
+  left: 16px;
+  bottom: 16px;
+  padding: 10px 14px;
+  background: var(--hud-bg);
+  color: #ffffff;
+  border-radius: 10px;
+  font-size: 14px;
+  letter-spacing: 0.2px;
+}
