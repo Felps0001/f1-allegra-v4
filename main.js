@@ -200,6 +200,7 @@ const sparks = [];
 const items = [];
 const confetti = [];
 const dust = [];
+const speedLines = [];
 let audioContext = null;
 
 function initOpponents() {
@@ -252,6 +253,21 @@ function resize() {
   readPalette();
   buildSkyline();
   buildMiniMap();
+  initSpeedLines();
+}
+
+function initSpeedLines() {
+  speedLines.length = 0;
+  for (let i = 0; i < config.speedLineCount; i++) {
+    speedLines.push({
+      x: Math.random(),
+      y: Math.random(),
+      w: 0.5 + Math.random() * 0.9,
+      l: 0.5 + Math.random() * 0.9,
+      a: 0.4 + Math.random() * 0.6,
+      drift: (Math.random() - 0.5) * 0.4,
+    });
+  }
 }
 
 function buildSkyline() {
@@ -420,6 +436,7 @@ function update(dt) {
   updateOffRoadState();
   updateDust(dt);
   spawnDust(dt, countdownActive);
+  updateSpeedLines(dt);
 
   if (!countdownActive && !state.raceFinished && !state.raceFailed) {
     state.raceTime += dt;
@@ -1252,29 +1269,57 @@ function drawConfetti() {
 
 function drawSpeedLines() {
   const intensity = Math.max(0, Math.min(1, state.speed / config.maxSpeed));
-  if (intensity <= 0.2) {
+  if (intensity <= 0.15 || speedLines.length === 0) {
     return;
   }
 
-  const horizonY = state.horizon + 10;
-  const bottomY = state.height - 40;
-  const length = config.speedLineLength * intensity;
+  const horizonY = state.horizon + 8;
+  const bottomY = state.height - 30;
+  const spanY = Math.max(1, bottomY - horizonY);
+  const baseLength = config.speedLineLength * (0.35 + intensity * 1.6);
 
   ctx.save();
-  ctx.globalAlpha = config.speedLineAlpha * intensity;
-  ctx.strokeStyle = "rgba(255, 255, 255, 0.9)";
-  ctx.lineWidth = config.speedLineWidth;
-
-  for (let i = 0; i < config.speedLineCount; i++) {
-    const t = i / config.speedLineCount;
-    const x = state.width * (0.1 + 0.8 * t + (Math.random() - 0.5) * 0.12);
-    const y = horizonY + Math.random() * (bottomY - horizonY);
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.95)";
+  for (const line of speedLines) {
+    const p = Math.max(0, Math.min(1, line.y));
+    const x = state.width * (0.08 + 0.84 * line.x);
+    const y = horizonY + p * spanY;
+    const lineLength = baseLength * (0.45 + 1.1 * p) * line.l;
+    const lineWidth = config.speedLineWidth * (0.6 + 1.8 * p) * line.w;
+    const alpha = config.speedLineAlpha * (0.35 + 0.65 * p) * line.a * intensity;
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = lineWidth;
     ctx.beginPath();
     ctx.moveTo(x, y);
-    ctx.lineTo(x, y + length);
+    ctx.lineTo(x, y + lineLength);
     ctx.stroke();
   }
   ctx.restore();
+}
+
+function updateSpeedLines(dt) {
+  const intensity = Math.max(0, Math.min(1, state.speed / config.maxSpeed));
+  if (intensity <= 0.1 || speedLines.length === 0) {
+    return;
+  }
+  const speedFactor = 0.4 + intensity * 2.1;
+  for (const line of speedLines) {
+    line.y += dt * speedFactor * (0.6 + line.l);
+    line.x += dt * state.curveSmoothed * line.drift;
+    if (line.y > 1.05) {
+      line.y = 0;
+      line.x = Math.random();
+      line.w = 0.5 + Math.random() * 0.9;
+      line.l = 0.5 + Math.random() * 0.9;
+      line.a = 0.4 + Math.random() * 0.6;
+      line.drift = (Math.random() - 0.5) * 0.4;
+    }
+    if (line.x < 0.02) {
+      line.x = 0.02;
+    } else if (line.x > 0.98) {
+      line.x = 0.98;
+    }
+  }
 }
 
 function drawMiniMap() {
